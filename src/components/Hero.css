@@ -1,0 +1,106 @@
+.coins-hero {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  background: var(--hero-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background layer — gradient only, no image */
+.coins-hero-bg {
+  position: absolute;
+  inset: -120px -80px;
+  background: var(--hero-bg);
+  will-change: transform, filter;
+  transition: none;
+}
+
+/* Dark tinted overlay */
+.coins-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.1) 0%,
+    rgba(0, 0, 0, 0.25) 50%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+  will-change: opacity;
+}
+
+body.dark .coins-hero-overlay {
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.3) 0%,
+    rgba(0, 0, 0, 0.55) 50%,
+    rgba(0, 0, 0, 0.3) 100%
+  );
+}
+
+/* ── The DigitalCoins.png showcase — behind the title ── */
+.hero-coin-showcase {
+  position: absolute;
+  inset: 0;
+  z-index: 0;          /* behind overlay (1) and title (2) */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  perspective: 800px;
+}
+
+.hero-coin-img {
+  width: 340px;
+  max-width: 60vw;
+  height: auto;
+  object-fit: contain;
+  will-change: transform;
+  transform-style: preserve-3d;
+  backface-visibility: visible;
+  opacity: 0.75;
+  filter: drop-shadow(0 8px 30px rgba(0, 0, 0, 0.3));
+}
+
+/* Title sits on top of everything */
+.coins-hero-title {
+  position: relative;
+  z-index: 3;
+  text-align: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.coins-hero-title h1 {
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: #ffffff;
+  text-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.8),
+    0 4px 16px rgba(0, 0, 0, 0.6),
+    0 0 48px rgba(0, 0, 0, 0.35);
+  -webkit-text-stroke: 1.5px rgba(0, 0, 0, 0.25);
+  paint-order: stroke fill;
+  margin: 0;
+  line-height: 1.1;
+}
+
+body.dark .coins-hero-title h1 {
+  -webkit-text-stroke: none;
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.55),
+    0 0 48px rgba(0, 0, 0, 0.25);
+}
+
+.coins-hero-title p {
+  margin: 12px 0 0;
+  font-size: 1.15rem;
+  color: rgba(255, 255, 255, 0.9);
+  letter-spacing: 2px;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}

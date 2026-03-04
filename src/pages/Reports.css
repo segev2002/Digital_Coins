@@ -1,0 +1,57 @@
+.reports-page {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.reports-page h2 {
+  text-align: center;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.reports-empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 60px 0;
+  font-size: 1.1rem;
+}
+
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+  gap: 20px;
+}
+
+.reports-chart-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  padding: 16px 16px 8px;
+  box-shadow: 0 4px 14px var(--shadow);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.reports-chart-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.reports-coin-img {
+  width: 28px;
+  height: 28px;
+}
+
+.reports-coin-sym {
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.reports-price {
+  margin-left: auto;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}

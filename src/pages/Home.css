@@ -1,0 +1,19 @@
+.home-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 20px;
+  padding: 24px;
+  align-items: start; /* ← prevents other cards from stretching to match a taller card */
+}
+
+.home-loading,
+.home-error {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.2rem;
+  color: var(--text-muted);
+}
+
+.home-error {
+  color: #e05c5c;
+}

@@ -1,0 +1,59 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Light theme (default) ── */
+:root {
+  --bg:          #faf8f2;
+  --bg-card:     #ffffff;
+  --bg-nav:      linear-gradient(135deg, #f5a623, #e8850c);
+  --text:        #333333;
+  --text-muted:  #777777;
+  --border:      #f5c842;
+  --shadow:      rgba(245, 166, 35, 0.18);
+  --grid-line:   #f0e8d0;
+  --input-bg:    #ffffff;
+  --hero-bg:     linear-gradient(135deg, #f5c842 0%, #e8850c 100%);
+
+  font-family: "Segoe UI", system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+/* ── Dark theme ── */
+body.dark {
+  --bg:          #0f0f17;
+  --bg-card:     #1a1a2a;
+  --bg-nav:      linear-gradient(135deg, #b87318, #8a5a08);
+  --text:        #e8e0d0;
+  --text-muted:  #9990aa;
+  --border:      #c8940a;
+  --shadow:      rgba(200, 148, 10, 0.22);
+  --grid-line:   #2a2a3a;
+  --input-bg:    #1a1a2a;
+  --hero-bg:     radial-gradient(circle at 50% 40%, #1b1b2b, #070710);
+
+  color: var(--text);
+  background-color: var(--bg);
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
