@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   ResponsiveContainer,
 } from "recharts";
+import { SplineSceneBasic } from "../components/SplineSceneBasic";
 import "./AIRecommendation.css";
 
 interface AIResult {
@@ -191,7 +192,16 @@ export default function AIRecommendation() {
   if (selectedCoins.length === 0) {
     return (
       <div className="ai-page">
-        <p className="ai-empty">No coins selected. Go to <strong>Home</strong> and toggle some coins.</p>
+        <div className="ai-hero">
+          <div className="ai-hero-robot">
+            <SplineSceneBasic />
+          </div>
+          <div className="ai-hero-panel">
+            <h2>AI Recommendation</h2>
+            <p className="ai-subtitle">Powered by NVIDIA NIM · Llama 3.1 70B</p>
+            <p className="ai-panel-hint">No coins selected. Go to <strong>Home</strong> and toggle some coins.</p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -201,143 +211,148 @@ export default function AIRecommendation() {
 
   return (
     <div className="ai-page">
-      <h2>AI Recommendation</h2>
-      <p className="ai-subtitle">Powered by NVIDIA NIM · Llama 3.1 70B</p>
 
-      <div className="ai-coin-list">
-        {selectedCoins.map((c) => (
-          <button
-            key={c.id}
-            className={`ai-coin-btn ${activeCoin === c.id ? "active" : ""}`}
-            onClick={() => handleAnalyze(c.id)}
-          >
-            <img src={c.image} alt={c.symbol} className="ai-coin-btn-img" />
-            {c.symbol} — {c.name}
-          </button>
-        ))}
+      {/* ── Full-screen hero: robot left, panel right ── */}
+      <div className="ai-hero">
+
+        {/* Robot fills the whole background */}
+        <div className="ai-hero-robot">
+          <SplineSceneBasic />
+        </div>
+
+        {/* Right-side overlay panel */}
+        <div className="ai-hero-panel">
+          <h2>AI Recommendation</h2>
+          <p className="ai-subtitle">Powered by NVIDIA NIM · Llama 3.1 70B</p>
+
+          <div className="ai-coin-list">
+            {selectedCoins.map((c) => (
+              <button
+                key={c.id}
+                className={`ai-coin-btn ${activeCoin === c.id ? "active" : ""}`}
+                onClick={() => handleAnalyze(c.id)}
+              >
+                <img src={c.image} alt={c.symbol} className="ai-coin-btn-img" />
+                {c.symbol} — {c.name}
+              </button>
+            ))}
+          </div>
+
+          {loading && (
+            <div className="ai-loading-block">
+              <div className="ai-spinner" />
+              <p>Analyzing with NVIDIA AI…</p>
+            </div>
+          )}
+          {error && <p className="ai-error">{error}</p>}
+
+          {!loading && !error && !analysis && (
+            <p className="ai-panel-hint">← Select a coin to get an AI analysis</p>
+          )}
+
+          {analysis && (
+            <div className="ai-result">
+
+              {/* ── Header ── */}
+              <div className="ai-result-header">
+                <span className={`ai-verdict-badge ${isBuy ? "buy" : "no-buy"}`}>
+                  {isBuy ? "✅ Buy" : "❌ Do Not Buy"}
+                </span>
+                <span className={`ai-risk-badge risk-${analysis.result.risk_level.toLowerCase()}`}>
+                  Risk: {analysis.result.risk_level}
+                </span>
+              </div>
+
+              {/* ── Summary ── */}
+              <p className="ai-summary">{analysis.result.summary}</p>
+
+              {/* ── Stats row ── */}
+              <div className="ai-stats-row">
+                <div className="ai-stat">
+                  <span className="ai-stat-label">Price</span>
+                  <span className="ai-stat-value">{fmtPrice(analysis.currentPrice)}</span>
+                </div>
+                <div className="ai-stat">
+                  <span className="ai-stat-label">Market Cap</span>
+                  <span className="ai-stat-value">{fmt(analysis.marketCap)}</span>
+                </div>
+                <div className="ai-stat">
+                  <span className="ai-stat-label">24h Volume</span>
+                  <span className="ai-stat-value">{fmt(analysis.volume24h)}</span>
+                </div>
+                <div className="ai-stat">
+                  <span className="ai-stat-label">30d Change</span>
+                  <span className={`ai-stat-value ${(analysis.change30d ?? 0) >= 0 ? "positive" : "negative"}`}>
+                    {analysis.change30d != null ? `${analysis.change30d.toFixed(2)}%` : "N/A"}
+                  </span>
+                </div>
+                <div className="ai-stat">
+                  <span className="ai-stat-label">200d Change</span>
+                  <span className={`ai-stat-value ${(analysis.change200d ?? 0) >= 0 ? "positive" : "negative"}`}>
+                    {analysis.change200d != null ? `${analysis.change200d.toFixed(2)}%` : "N/A"}
+                  </span>
+                </div>
+              </div>
+
+              {/* ── 30-day price chart ── */}
+              <div className="ai-chart-section">
+                <h4>30-Day Price History — {analysis.coinName}</h4>
+                <ResponsiveContainer width="100%" height={180}>
+                  <AreaChart data={analysis.history} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor={accentColor} stopOpacity={0.35} />
+                        <stop offset="95%" stopColor={accentColor} stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#aaa" }} interval={4} />
+                    <YAxis
+                      tick={{ fontSize: 9, fill: "#aaa" }}
+                      width={70}
+                      tickFormatter={(v: number) =>
+                        v >= 1000 ? `$${(v / 1000).toFixed(1)}k` : v < 1 ? `$${v.toFixed(4)}` : `$${v.toFixed(2)}`
+                      }
+                      domain={["auto", "auto"]}
+                    />
+                    <Tooltip
+                      contentStyle={{ background: "#1a1a2a", border: "1px solid #444", borderRadius: 8 }}
+                      labelStyle={{ color: "#aaa" }}
+                      itemStyle={{ color: accentColor }}
+                      formatter={(v) => {
+                        const n = Number(v);
+                        return [`$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}`, "Price"] as [string, string];
+                      }}
+                    />
+                    <Area type="monotone" dataKey="price" stroke={accentColor} strokeWidth={2} fill="url(#aiGrad)" dot={false} isAnimationActive={true} />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* ── Bull / Bear points ── */}
+              <div className="ai-points-row">
+                {analysis.result.bull_points.length > 0 && (
+                  <div className="ai-points bull">
+                    <h4>🟢 Reasons to Buy</h4>
+                    <ul>
+                      {analysis.result.bull_points.map((p, i) => <li key={i}>{p}</li>)}
+                    </ul>
+                  </div>
+                )}
+                {analysis.result.bear_points.length > 0 && (
+                  <div className="ai-points bear">
+                    <h4>🔴 Risks / Reasons to Avoid</h4>
+                    <ul>
+                      {analysis.result.bear_points.map((p, i) => <li key={i}>{p}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+            </div>
+          )}
+        </div>
       </div>
-
-      {loading && (
-        <div className="ai-loading-block">
-          <div className="ai-spinner" />
-          <p>Analyzing with NVIDIA AI…</p>
-        </div>
-      )}
-      {error && <p className="ai-error">{error}</p>}
-
-      {analysis && (
-        <div className="ai-result">
-
-          {/* ── Header ── */}
-          <div className="ai-result-header">
-            <span className={`ai-verdict-badge ${isBuy ? "buy" : "no-buy"}`}>
-              {isBuy ? "✅ Buy" : "❌ Do Not Buy"}
-            </span>
-            <span className={`ai-risk-badge risk-${analysis.result.risk_level.toLowerCase()}`}>
-              Risk: {analysis.result.risk_level}
-            </span>
-          </div>
-
-          {/* ── Summary ── */}
-          <p className="ai-summary">{analysis.result.summary}</p>
-
-          {/* ── Stats row ── */}
-          <div className="ai-stats-row">
-            <div className="ai-stat">
-              <span className="ai-stat-label">Price</span>
-              <span className="ai-stat-value">{fmtPrice(analysis.currentPrice)}</span>
-            </div>
-            <div className="ai-stat">
-              <span className="ai-stat-label">Market Cap</span>
-              <span className="ai-stat-value">{fmt(analysis.marketCap)}</span>
-            </div>
-            <div className="ai-stat">
-              <span className="ai-stat-label">24h Volume</span>
-              <span className="ai-stat-value">{fmt(analysis.volume24h)}</span>
-            </div>
-            <div className="ai-stat">
-              <span className="ai-stat-label">30d Change</span>
-              <span className={`ai-stat-value ${(analysis.change30d ?? 0) >= 0 ? "positive" : "negative"}`}>
-                {analysis.change30d != null ? `${analysis.change30d.toFixed(2)}%` : "N/A"}
-              </span>
-            </div>
-            <div className="ai-stat">
-              <span className="ai-stat-label">200d Change</span>
-              <span className={`ai-stat-value ${(analysis.change200d ?? 0) >= 0 ? "positive" : "negative"}`}>
-                {analysis.change200d != null ? `${analysis.change200d.toFixed(2)}%` : "N/A"}
-              </span>
-            </div>
-          </div>
-
-          {/* ── 30-day price chart ── */}
-          <div className="ai-chart-section">
-            <h4>30-Day Price History — {analysis.coinName}</h4>
-            <ResponsiveContainer width="100%" height={220}>
-              <AreaChart data={analysis.history} margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="aiGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={accentColor} stopOpacity={0.35} />
-                    <stop offset="95%" stopColor={accentColor} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--grid-line)" />
-                <XAxis
-                  dataKey="date"
-                  tick={{ fontSize: 10, fill: "var(--text-muted)" }}
-                  interval={4}
-                />
-                <YAxis
-                  tick={{ fontSize: 10, fill: "var(--text-muted)" }}
-                  width={80}
-                  tickFormatter={(v: number) =>
-                    v >= 1000 ? `$${(v / 1000).toFixed(1)}k` : v < 1 ? `$${v.toFixed(4)}` : `$${v.toFixed(2)}`
-                  }
-                  domain={["auto", "auto"]}
-                />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg-card)", border: "1px solid var(--border)", borderRadius: 8 }}
-                  labelStyle={{ color: "var(--text-muted)" }}
-                  itemStyle={{ color: accentColor }}
-                  formatter={(v) => {
-                    const n = Number(v);
-                    return [`$${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 6 })}`, "Price"] as [string, string];
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="price"
-                  stroke={accentColor}
-                  strokeWidth={2}
-                  fill="url(#aiGrad)"
-                  dot={false}
-                  isAnimationActive={true}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* ── Bull / Bear points ── */}
-          <div className="ai-points-row">
-            {analysis.result.bull_points.length > 0 && (
-              <div className="ai-points bull">
-                <h4>🟢 Reasons to Buy</h4>
-                <ul>
-                  {analysis.result.bull_points.map((p, i) => <li key={i}>{p}</li>)}
-                </ul>
-              </div>
-            )}
-            {analysis.result.bear_points.length > 0 && (
-              <div className="ai-points bear">
-                <h4>🔴 Risks / Reasons to Avoid</h4>
-                <ul>
-                  {analysis.result.bear_points.map((p, i) => <li key={i}>{p}</li>)}
-                </ul>
-              </div>
-            )}
-          </div>
-
-        </div>
-      )}
     </div>
   );
 }
